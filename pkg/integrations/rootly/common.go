@@ -29,7 +29,6 @@ type WebhookEvent struct {
 
 type webhookRequest struct {
 	payload WebhookPayload
-	config  any
 }
 
 func decodeAndVerifyWebhook[T any](ctx core.WebhookRequestContext, config *T) (*webhookRequest, int, error) {
@@ -54,5 +53,5 @@ func decodeAndVerifyWebhook[T any](ctx core.WebhookRequestContext, config *T) (*
 		return nil, http.StatusBadRequest, fmt.Errorf("error parsing request body: %v", err)
 	}
 
-	return &webhookRequest{payload: payload, config: config}, http.StatusOK, nil
+	return &webhookRequest{payload: payload}, http.StatusOK, nil
 }
