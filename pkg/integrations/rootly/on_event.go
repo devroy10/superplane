@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 	"time"
-	
+
 	"github.com/superplanehq/superplane/pkg/configuration"
 	"github.com/superplanehq/superplane/pkg/core"
 )
