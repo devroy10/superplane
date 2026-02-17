@@ -230,14 +230,14 @@ func buildIncidentEventPayload(incident map[string]any, incidentEvent map[string
 	}
 
 	payload := map[string]any{
-		"id":                extractString(incidentEvent, "id"),
-		"event":             extractString(incidentEvent, "event"),
-		"event_type":        eventType,
-		"kind":              extractString(incidentEvent, "kind"),
-		"occurred_at":       extractString(incidentEvent, "occurred_at"),
-		"created_at":        extractString(incidentEvent, "created_at"),
-		"visibility":        extractString(incidentEvent, "visibility"),
-		"incident":          incident,
+		"id":          extractString(incidentEvent, "id"),
+		"event":       extractString(incidentEvent, "event"),
+		"event_type":  eventType,
+		"kind":        extractString(incidentEvent, "kind"),
+		"occurred_at": extractString(incidentEvent, "occurred_at"),
+		"created_at":  extractString(incidentEvent, "created_at"),
+		"visibility":  extractString(incidentEvent, "visibility"),
+		"incident":    incident,
 	}
 
 	return payload

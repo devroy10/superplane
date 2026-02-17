@@ -196,6 +196,7 @@ func Test__OnEvent__HandleWebhook(t *testing.T) {
 
 		payload := eventContext.Payloads[0].Data.(map[string]any)
 		assert.Equal(t, "another try", payload["event"])
+		assert.Equal(t, "incident_event.created", payload["event_type"])
 		incident := payload["incident"].(map[string]any)
 		assert.Equal(t, "5dcbfe70-0416-469a-8629-be5353f4fd60", incident["id"])
 	})
