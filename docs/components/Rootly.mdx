@@ -37,6 +37,12 @@ The On Event trigger starts a workflow execution when Rootly incident timeline e
 
 ### Configuration
 
+- **Incident Status**: Optional filter by incident status (open, resolved, etc.)
+- **Severity**: Optional filter by incident severity
+- **Service**: Optional filter by service name
+- **Team**: Optional filter by team name
+- **Event Source**: Optional filter by event source (web, api, system)
+- **Event Kind**: Optional filter by event kind (note, annotation, event, trail)
 - **Visibility**: Optional filter by event visibility (internal or external)
 
 ### Event Data
@@ -46,6 +52,7 @@ Each incident event includes:
 - **event**: Event content
 - **event_type**: Event type (incident_event.created or incident_event.updated)
 - **kind**: Event kind
+- **source**: Event source
 - **occurred_at**: When the event occurred
 - **created_at**: When the event was created
 - **incident**: Incident information
@@ -59,19 +66,16 @@ This trigger automatically sets up a Rootly webhook endpoint when configured. Th
 ```json
 {
   "data": {
-    "created_at": "2026-02-17T07:19:04.772-08:00",
-    "event": "trying new configs, error none",
+    "created_at": "2026-02-20T04:46:36.748-08:00",
+    "event": "this incident is still live, investigation ongoing",
     "event_type": "incident_event.created",
-    "id": "251d3d98-65bb-44bc-9e31-607d037c6c39",
-    "incident": {
-      "id": "5dcbfe70-0416-469a-8629-be5353f4fd60"
-    },
+    "id": "d09e31d4-a884-4b48-a6cf-2549e47539a3",
     "kind": "event",
-    "occurred_at": "2026-02-17T07:19:04.772-08:00",
-    "user_display_name": "",
+    "occurred_at": "2026-02-20T04:46:36.748-08:00",
+    "source": "web",
     "visibility": "internal"
   },
-  "timestamp": "2026-02-17T15:19:20.901088287Z",
+  "timestamp": "2026-02-20T12:46:56.234164534Z",
   "type": "rootly.onEvent"
 }
 ```

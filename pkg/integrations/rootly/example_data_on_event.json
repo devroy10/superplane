@@ -1,17 +1,14 @@
 {
   "data": {
-    "created_at": "2026-02-17T07:19:04.772-08:00",
-    "event": "trying new configs, error none",
+    "created_at": "2026-02-20T04:46:36.748-08:00",
+    "event": "this incident is still live, investigation ongoing",
     "event_type": "incident_event.created",
-    "id": "251d3d98-65bb-44bc-9e31-607d037c6c39",
-    "incident": {
-      "id": "5dcbfe70-0416-469a-8629-be5353f4fd60"
-    },
+    "id": "d09e31d4-a884-4b48-a6cf-2549e47539a3",
     "kind": "event",
-    "occurred_at": "2026-02-17T07:19:04.772-08:00",
-    "user_display_name": "",
+    "occurred_at": "2026-02-20T04:46:36.748-08:00",
+    "source": "web",
     "visibility": "internal"
   },
-  "timestamp": "2026-02-17T15:19:20.901088287Z",
+  "timestamp": "2026-02-20T12:46:56.234164534Z",
   "type": "rootly.onEvent"
 }

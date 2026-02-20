@@ -1,8 +1,11 @@
 package rootly
 
 import (
+	"io"
 	"net/http"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -199,6 +202,62 @@ func Test__OnEvent__HandleWebhook(t *testing.T) {
 		assert.Equal(t, "incident_event.created", payload["event_type"])
 		incident := payload["incident"].(map[string]any)
 		assert.Equal(t, "5dcbfe70-0416-469a-8629-be5353f4fd60", incident["id"])
+	})
+
+	t.Run("incident filters -> fetches incident and emits", func(t *testing.T) {
+		now := time.Now().UTC().Format(time.RFC3339)
+		body := []byte(`{"event":{"type":"incident_event.updated","id":"evt-200","issued_at":"` + now + `"},"data":{"id":"ev-200","event":"Status update","kind":"trail","source":"web","visibility":"internal","occurred_at":"` + now + `","created_at":"` + now + `","incident_id":"inc-200"}}`)
+		secret := "test-secret"
+		timestamp := "1234567890"
+
+		headers := http.Header{}
+		headers.Set("X-Rootly-Signature", signatureFor(secret, timestamp, body))
+
+		httpCtx := &contexts.HTTPContext{
+			Responses: []*http.Response{
+				{
+					StatusCode: http.StatusOK,
+					Body: io.NopCloser(strings.NewReader(`{
+  "data": {
+    "id": "inc-200",
+    "attributes": {
+      "status": "resolved",
+      "severity": "sev2"
+    },
+    "relationships": {
+      "services": {"data": [{"type": "services", "id": "svc-1"}]},
+      "groups": {"data": [{"type": "groups", "id": "team-1"}]}
+    }
+  },
+  "included": [
+    {"id": "svc-1", "type": "services", "attributes": {"name": "API"}},
+    {"id": "team-1", "type": "groups", "attributes": {"name": "Platform"}}
+  ]
+}`)),
+				},
+			},
+		}
+
+		integrationCtx := &contexts.IntegrationContext{
+			Configuration: map[string]any{"apiKey": "test-key"},
+		}
+
+		eventContext := &contexts.EventContext{}
+		code, err := trigger.HandleWebhook(core.WebhookRequestContext{
+			Body:          body,
+			Headers:       headers,
+			Configuration: map[string]any{"incidentStatus": []string{"resolved"}, "severity": []string{"sev2"}, "service": []string{"API"}, "team": []string{"Platform"}},
+			Webhook:       &contexts.WebhookContext{Secret: secret},
+			Events:        eventContext,
+			Metadata:      &contexts.MetadataContext{},
+			HTTP:          httpCtx,
+			Integration:   integrationCtx,
+		})
+
+		require.Equal(t, http.StatusOK, code)
+		require.NoError(t, err)
+		require.Equal(t, 1, eventContext.Count())
+		require.Len(t, httpCtx.Requests, 1)
 	})
 }
 

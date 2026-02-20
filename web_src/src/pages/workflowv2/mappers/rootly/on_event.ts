@@ -36,9 +36,57 @@ export const onEventTriggerRenderer: TriggerRenderer = {
   getTriggerProps: (context: TriggerRendererContext) => {
     const { node, definition, lastEvent } = context;
     const configuration = node.configuration as {
+      incidentStatus?: string[];
+      severity?: string[];
+      service?: string[];
+      team?: string[];
+      eventSource?: string[];
+      eventKind?: string[];
       visibility?: string;
     };
     const metadataItems = [];
+
+    if (configuration?.incidentStatus?.length) {
+      metadataItems.push({
+        icon: "funnel",
+        label: `Status: ${configuration.incidentStatus.join(", ")}`,
+      });
+    }
+
+    if (configuration?.severity?.length) {
+      metadataItems.push({
+        icon: "alert-circle",
+        label: `Severity: ${configuration.severity.join(", ")}`,
+      });
+    }
+
+    if (configuration?.service?.length) {
+      metadataItems.push({
+        icon: "layers",
+        label: `Service: ${configuration.service.join(", ")}`,
+      });
+    }
+
+    if (configuration?.team?.length) {
+      metadataItems.push({
+        icon: "users",
+        label: `Team: ${configuration.team.join(", ")}`,
+      });
+    }
+
+    if (configuration?.eventSource?.length) {
+      metadataItems.push({
+        icon: "activity",
+        label: `Source: ${configuration.eventSource.join(", ")}`,
+      });
+    }
+
+    if (configuration?.eventKind?.length) {
+      metadataItems.push({
+        icon: "tag",
+        label: `Kind: ${configuration.eventKind.join(", ")}`,
+      });
+    }
 
     if (configuration?.visibility) {
       metadataItems.push({
@@ -58,7 +106,9 @@ export const onEventTriggerRenderer: TriggerRenderer = {
       const eventData = lastEvent.data as OnEventEventData;
       const incident = eventData?.incident;
       const title = eventData?.event || incident?.title || "Incident event";
-      const contentParts = [incident?.title, incident?.severity, incident?.status].filter(Boolean).join(" · ");
+      const contentParts = [eventData?.kind, incident?.title, incident?.severity, incident?.status]
+        .filter(Boolean)
+        .join(" · ");
       const subtitle = buildSubtitle(contentParts, lastEvent.createdAt);
 
       props.lastEventData = {
@@ -98,8 +148,16 @@ function getDetailsForIncidentEventPayload(eventData?: OnEventEventData): Record
     details.Event = eventData.event;
   }
 
+  if (eventData.id) {
+    details["Event ID"] = eventData.id;
+  }
+
   if (eventData.kind) {
     details.Kind = eventData.kind;
+  }
+
+  if (eventData.source) {
+    details.Source = eventData.source;
   }
 
   if (eventData.visibility) {
@@ -112,10 +170,6 @@ function getDetailsForIncidentEventPayload(eventData?: OnEventEventData): Record
 
   if (eventData.occurred_at) {
     details["Occurred At"] = new Date(eventData.occurred_at).toLocaleString();
-  }
-
-  if (eventData.id) {
-    details["Event ID"] = eventData.id;
   }
 
   if (eventData.incident) {

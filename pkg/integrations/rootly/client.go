@@ -259,19 +259,43 @@ type IncidentEventResponse struct {
 	Data IncidentEventData `json:"data"`
 }
 
-// severityString extracts the severity slug from the API response.
-// Rootly returns severity as a string (slug) or an object with slug/name fields.
+// severityString extracts a severity slug/name from Rootly responses.
+// Rootly may return severity as a string, a flat object, or a JSON:API nested object.
 func severityString(v any) string {
 	switch s := v.(type) {
 	case string:
+		// Severity already provided as a slug/name string.
 		return s
 	case map[string]any:
-		if slug, ok := s["slug"].(string); ok {
-			return slug
+		// Severity provided as a flat object with slug/name fields.
+		if value := severityFromMap(s); value != "" {
+			return value
 		}
-		if name, ok := s["name"].(string); ok {
-			return name
+
+		// Severity provided as a nested JSON:API object: {data:{attributes:{slug/name}}}.
+		data, ok := s["data"].(map[string]any)
+		if !ok {
+			return ""
 		}
+
+		attrs, ok := data["attributes"].(map[string]any)
+		if !ok {
+			return ""
+		}
+
+		return severityFromMap(attrs)
+	default:
+		return ""
+	}
+}
+
+func severityFromMap(values map[string]any) string {
+	if slug, ok := values["slug"].(string); ok && slug != "" {
+		return slug
+	}
+
+	if name, ok := values["name"].(string); ok && name != "" {
+		return name
 	}
 
 	return ""
